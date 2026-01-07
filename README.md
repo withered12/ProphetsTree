@@ -63,6 +63,6 @@ npm run build
 *   `src/main.ts`: Main application logic and UI handling.
 *   `src/styles/`: CSS styles and theme definitions.
 
-## License 📄
+## License 
 
 [MIT](LICENSE)
