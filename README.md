@@ -12,7 +12,7 @@ An interactive web application visualizing the genealogical tree of the Prophets
 *   **Arabic Support:** Fully localized interface with RTL layout.
 *   **PWA Ready:** Built with offline capabilities in mind.
 
-## Tech Stack 🛠️
+## Tech Stack 
 
 *   **Framework:** [Vite](https://vitejs.dev/) + [TypeScript](https://www.typescriptlang.org/)
 *   **Visualization:** [D3.js (v7)](https://d3js.org/)
