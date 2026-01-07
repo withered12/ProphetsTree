@@ -1,8 +1,8 @@
-# ProphetsTree 🌳
+# ProphetsTree 
 
 An interactive web application visualizing the genealogical tree of the Prophets, built with D3.js and modern web technologies. Focuses on a clean, mobile-first experience with Arabic (RTL) support.
 
-## Features ✨
+## Features 
 
 *   **Interactive Tree:** Zoomable and pannable genealogical tree using D3.js.
 *   **Prophet Details:** Click on any node to view detailed information in a responsive bottom sheet.
@@ -20,7 +20,7 @@ An interactive web application visualizing the genealogical tree of the Prophets
 *   **Fonts:** Amiri (Headings) & Cairo (Body).
 *   **Mobile Wrapper:** [Capacitor](https://capacitorjs.com/) (Android configured).
 
-## Getting Started 🚀
+## Getting Started 
 
 ### Prerequisites
 
@@ -56,7 +56,7 @@ Build for production:
 npm run build
 ```
 
-## Project Structure 📂
+## Project Structure 
 
 *   `src/data/prophets.ts`: Graph data definition.
 *   `src/logic/treeGraph.ts`: D3.js visualization logic.
