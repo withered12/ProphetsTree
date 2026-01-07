@@ -1,0 +1,397 @@
+@import './theme.css';
+
+/* --- Global Reset & Base --- */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--md-sys-typescale-body-large-font);
+    background-color: var(--md-sys-color-background);
+    color: var(--md-sys-color-on-background);
+    height: 100vh;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+    /* Fallback */
+    height: var(--app-height, 100vh);
+    position: relative;
+    /* Context for absolute children */
+    touch-action: none;
+    /* specific to D3 container */
+
+    /* Horizontal Safe Areas handled by components now */
+}
+
+/* --- D3 Graph Styles --- */
+.link {
+    fill: none;
+    stroke: var(--md-sys-color-outline-variant);
+    stroke-width: 2px;
+    transition: stroke 0.3s;
+}
+
+.node {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.node-text {
+    font-family: var(--md-sys-typescale-header-small-font);
+    /* Using header font for names */
+    font-weight: bold;
+    font-size: 14px;
+    fill: var(--md-sys-color-on-background);
+    pointer-events: none;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8);
+}
+
+.node-circle {
+    fill: var(--md-sys-color-surface-variant);
+    stroke: var(--md-sys-color-outline);
+    stroke-width: 3px;
+    transition: all 0.3s ease;
+}
+
+/* Node Types - Mapping to Tokens */
+.node-circle.type-ulu-alazm {
+    fill: var(--prophet-ulu-alazm);
+    stroke: var(--md-sys-color-on-primary);
+}
+
+.node-circle.type-messenger {
+    fill: var(--prophet-messenger);
+    stroke: #047857;
+}
+
+.node-circle.type-prophet {
+    fill: var(--prophet-prophet);
+    stroke: #1d4ed8;
+}
+
+.node-circle.type-connector {
+    fill: var(--prophet-connector);
+    stroke: var(--md-sys-color-outline);
+}
+
+.node-circle.type-relative {
+    fill: var(--prophet-relative);
+    stroke: #b45309;
+}
+
+.halo-ring {
+    fill: none;
+    stroke: var(--prophet-ulu-alazm);
+    stroke-width: 2px;
+    stroke-opacity: 0.3;
+}
+
+.node:hover .node-circle,
+.node-circle.active {
+    stroke-width: 5px;
+    filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.2));
+}
+
+.node-circle.active {
+    stroke: var(--md-sys-color-primary);
+    /* Highlight active selection */
+}
+
+/* --- UI Components --- */
+
+/* FAB (Floating Action Button) */
+.fab-container {
+    position: absolute;
+    bottom: 100px;
+    left: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    z-index: 100;
+}
+
+.fab {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    /* M3 Container shape */
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    /* Elevation 3 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.fab:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.fab svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+/* Bottom Sheet */
+.bottom-sheet {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--md-sys-color-surface);
+    border-top-left-radius: 28px;
+    border-top-right-radius: 28px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.2, 0.0, 0.0, 1.0);
+    z-index: 200;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.bottom-sheet.open {
+    transform: translateY(0);
+}
+
+.sheet-handle {
+    width: 32px;
+    height: 4px;
+    background-color: var(--md-sys-color-outline-variant);
+    border-radius: 2px;
+    margin: 16px auto;
+}
+
+.sheet-content {
+    padding: 0 24px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    overflow-y: auto;
+}
+
+.sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.sheet-title {
+    font-family: var(--md-sys-typescale-headline-small-font);
+    font-size: 24px;
+    color: var(--md-sys-color-on-surface);
+    margin: 0;
+}
+
+
+.prophet-badge {
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Utility */
+.hidden {
+    display: none !important;
+}
+
+/* Bottom App Bar */
+.bottom-app-bar {
+    position: absolute;
+    /* Stick to bottom of RESIZED #app container */
+    bottom: 0;
+
+    /* Strictly constrain to Safe Area */
+    left: env(safe-area-inset-left, 0px);
+    right: env(safe-area-inset-right, 0px);
+    width: auto;
+    /* Width is defined by left/right constraints */
+
+    height: auto;
+    min-height: 80px;
+    background-color: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+
+    /* Vertical Safe Area */
+    padding-bottom: env(safe-area-inset-bottom, 8px);
+
+    /* Horizontal internal padding not needed for safety anymore, kept for design */
+
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.05);
+    z-index: 100;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+
+    #btn-zoom-in,
+    #btn-zoom-out {
+        display: none !important;
+    }
+
+    #btn-reset {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        bottom: 90px;
+    }
+
+    #btn-reset svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .fab-container {
+        /* Ensure it sits above the bar even with safe area adjustments */
+        bottom: 100px;
+    }
+}
+
+.icon-button {
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+    cursor: pointer;
+}
+
+.icon-button:active {
+    background-color: var(--md-sys-color-surface-variant);
+}
+
+/* Search */
+.search-container {
+    flex: 1;
+    margin: 0 12px;
+    position: relative;
+}
+
+.search-field {
+    background-color: var(--md-sys-color-surface-variant);
+    border-radius: 28px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+}
+
+#search-input {
+    background: transparent;
+    border: none;
+    font-family: var(--md-sys-typescale-body-large-font);
+    font-size: 16px;
+    color: var(--md-sys-color-on-surface-variant);
+    flex: 1;
+    padding: 0 12px;
+    outline: none;
+}
+
+.search-results {
+    position: absolute;
+    bottom: 60px;
+    /* Above bar */
+    left: 0;
+    right: 0;
+    background: var(--md-sys-color-surface);
+    border-radius: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    /* Logic will toggle flex/block */
+    flex-direction: column;
+}
+
+.search-results.visible {
+    display: flex;
+}
+
+.search-result-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    cursor: pointer;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+/* Dialog */
+.m3-dialog {
+    border: none;
+    border-radius: 28px;
+    background-color: var(--md-sys-color-surface-container-high, #ece6f0);
+    background: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    padding: 24px;
+    min-width: 280px;
+}
+
+.m3-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.dialog-header h3 {
+    margin: 0;
+    font-family: var(--md-sys-typescale-headline-small-font);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-family: var(--md-sys-typescale-body-large-font);
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-left: 12px;
+}
+
+.legend-color.type-ulu-alazm {
+    background: var(--prophet-ulu-alazm);
+}
+
+.legend-color.type-messenger {
+    background: var(--prophet-messenger);
+}
+
+.legend-color.type-prophet {
+    background: var(--prophet-prophet);
+}
+
+.legend-color.type-connector {
+    background: var(--prophet-connector);
+}

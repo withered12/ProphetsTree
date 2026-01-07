@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>شجرة الأنبياء</title>
+
+
+
+  <!-- Material Icons (Using SVG directly in FABs for offline safety, but link included for dev) -->
+  <style>
+    /* Backdrop for Bottom Sheet */
+    .backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 150;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .backdrop.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" style="width: 100%; height: 100%;"></div>
+
+  <!-- Top App Bar (Simple Floating Title) -->
+  <header
+    style="position: absolute; top: 16px; left: 0; right: 0; display: flex; justify-content: center; pointer-events: none;">
+    <div
+      style="background: rgba(255,255,255,0.9); padding: 8px 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); backdrop-filter: blur(4px);">
+      <h1 style="margin: 0; font-family: 'Amiri', serif; font-size: 20px; color: var(--md-sys-color-primary);">شجرة
+        الأنبياء</h1>
+    </div>
+  </header>
+
+  <!-- FABs (Controls) -->
+  <div class="fab-container">
+    <button class="fab" id="btn-zoom-in" aria-label="Zoom In">
+      <svg viewBox="0 0 24 24">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+      </svg>
+    </button>
+    <button class="fab" id="btn-zoom-out" aria-label="Zoom Out">
+      <svg viewBox="0 0 24 24">
+        <path d="M19 13H5v-2h14v2z" />
+      </svg>
+    </button>
+    <button class="fab" id="btn-reset" aria-label="Reset View"
+      style="background-color: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container);">
+      <svg viewBox="0 0 24 24">
+        <path
+          d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Bottom Sheet -->
+  <div id="sheet-backdrop" class="backdrop"></div>
+  <div id="details-sheet" class="bottom-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-content">
+      <div class="sheet-header">
+        <div style="display: flex; flex-direction: column; align-items: flex-start;">
+          <span id="sheet-badge" class="prophet-badge"></span>
+          <h2 id="sheet-title" class="sheet-title">Title</h2>
+          <span id="sheet-subtitle" style="font-size: 14px; color: var(--md-sys-color-on-surface-variant);"></span>
+        </div>
+        <button id="btn-close-sheet"
+          style="background: none; border: none; cursor: pointer; color: var(--md-sys-color-on-surface-variant);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div id="sheet-content-body" style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- Timeline -->
+        <div style="background-color: var(--md-sys-color-surface-variant); padding: 12px; border-radius: 12px;">
+          <div style="font-size: 12px; font-weight: bold; color: var(--md-sys-color-primary); margin-bottom: 4px;">
+            الفترة الزمنية</div>
+          <div id="detail-timeline" style="font-size: 14px;"></div>
+        </div>
+
+        <!-- Relation -->
+        <div>
+          <div style="font-size: 12px; font-weight: bold; color: var(--md-sys-color-outline); margin-bottom: 4px;">النسب
+            / الصلة</div>
+          <div id="detail-relation" style="font-size: 14px; line-height: 1.5;"></div>
+        </div>
+
+        <!-- Desc -->
+        <div>
+          <div style="font-size: 12px; font-weight: bold; color: var(--md-sys-color-outline); margin-bottom: 4px;">نبذة
+          </div>
+          <div id="detail-desc" style="font-size: 14px; line-height: 1.6;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom App Bar -->
+  <div class="bottom-app-bar">
+    <button class="icon-button" id="btn-legend" aria-label="Legend">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+        <path
+          d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+      </svg>
+    </button>
+
+    <div class="search-container">
+      <div class="search-field">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-sys-color-on-surface-variant)"
+          style="margin-left: 12px;">
+          <path
+            d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+        </svg>
+        <input type="text" id="search-input" placeholder="ابحث عن نبي..." />
+      </div>
+      <div id="search-results" class="search-results"></div>
+    </div>
+
+    <button class="icon-button" id="btn-theme" aria-label="Toggle Theme">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+        <path
+          d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Legend Dialog -->
+  <dialog id="legend-dialog" class="m3-dialog">
+    <div class="dialog-header">
+      <h3>دليل الألوان</h3>
+      <button class="icon-button" id="btn-close-legend">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+          <path
+            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+        </svg>
+      </button>
+    </div>
+    <div class="dialog-content">
+      <div class="legend-item"><span class="legend-color type-ulu-alazm"></span><span>أولو العزم</span></div>
+      <div class="legend-item"><span class="legend-color type-messenger"></span><span>رسول</span></div>
+      <div class="legend-item"><span class="legend-color type-prophet"></span><span>نبي</span></div>
+      <div class="legend-item"><span class="legend-color type-connector"></span><span>نسل / صلة</span></div>
+    </div>
+  </dialog>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
